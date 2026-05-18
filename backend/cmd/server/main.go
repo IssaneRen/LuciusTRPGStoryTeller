@@ -19,6 +19,10 @@ import (
 var frontendFS embed.FS
 
 func main() {
+	if os.Getenv("GIN_MODE") == "release" && os.Getenv("JWT_SECRET") == "" {
+		log.Fatal("JWT_SECRET environment variable is required in production")
+	}
+
 	dbPath := os.Getenv("DB_PATH")
 	if dbPath == "" {
 		dbPath = "./data/app.db"

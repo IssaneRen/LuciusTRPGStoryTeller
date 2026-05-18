@@ -48,7 +48,7 @@ func (h *AuthHandler) Login(c *gin.Context) {
 	found := h.DB.Where("username = ?", req.Username).First(&user).Error == nil
 	// constant-time: always run bcrypt to prevent user enumeration via timing
 	if !found {
-		util.CheckPassword(req.Password, "$2a$10$0000000000000000000000000000000000000000000000000000")
+		util.CheckPassword(req.Password, "$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy")
 		c.JSON(http.StatusUnauthorized, gin.H{"code": 401, "message": "invalid credentials"})
 		return
 	}

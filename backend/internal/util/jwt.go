@@ -41,7 +41,7 @@ func ParseToken(tokenStr string) (uint, error) {
 		return 0, errors.New("invalid claims")
 	}
 	userID, ok := claims["user_id"].(float64)
-	if !ok {
+	if !ok || userID < 0 || userID != float64(uint(userID)) {
 		return 0, errors.New("invalid user_id claim")
 	}
 	return uint(userID), nil

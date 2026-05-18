@@ -8,6 +8,7 @@ dev: ## 启动完整开发环境 (前后端并行)
 	@make dev-backend & make dev-frontend
 
 dev-backend: ## 启动后端 (hot-reload 需安装 air)
+	@mkdir -p backend/cmd/server/dist && touch backend/cmd/server/dist/index.html
 	cd backend && go run ./cmd/server
 
 dev-frontend: ## 启动前端 dev server
