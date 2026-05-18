@@ -17,14 +17,19 @@ install: ## 安装所有依赖
 	cd backend && go mod download
 	cd frontend && pnpm install
 
-build: ## 构建生产包 (前端打包 + Go 二进制)
+build: ## 构建生产包 (前端嵌入Go单二进制)
 	cd frontend && pnpm build
+	rm -rf backend/cmd/server/dist
+	cp -r frontend/dist backend/cmd/server/dist
 	cd backend && go build -o bin/server ./cmd/server
 
-check: fmt test ## 提交前检查 (fmt + test)
+check: fmt lint test ## 提交前检查 (fmt + lint + test)
 
 fmt: ## 格式化代码
 	cd backend && gofmt -w .
+
+lint: ## 静态检查
+	cd backend && go vet ./...
 
 test: test-backend ## 运行所有测试
 

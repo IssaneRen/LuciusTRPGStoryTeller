@@ -1,6 +1,8 @@
 package util
 
 import (
+	"errors"
+	"log"
 	"os"
 	"time"
 
@@ -10,6 +12,9 @@ import (
 func getSecret() []byte {
 	s := os.Getenv("JWT_SECRET")
 	if s == "" {
+		if os.Getenv("GIN_MODE") == "release" {
+			log.Fatal("JWT_SECRET is required in production")
+		}
 		s = "dev-secret"
 	}
 	return []byte(s)
@@ -31,7 +36,13 @@ func ParseToken(tokenStr string) (uint, error) {
 	if err != nil {
 		return 0, err
 	}
-	claims := token.Claims.(jwt.MapClaims)
-	uid := uint(claims["user_id"].(float64))
-	return uid, nil
+	claims, ok := token.Claims.(jwt.MapClaims)
+	if !ok {
+		return 0, errors.New("invalid claims")
+	}
+	userID, ok := claims["user_id"].(float64)
+	if !ok {
+		return 0, errors.New("invalid user_id claim")
+	}
+	return uint(userID), nil
 }

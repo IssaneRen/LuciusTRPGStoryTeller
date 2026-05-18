@@ -29,6 +29,7 @@ tmp/
 backend/tmp/
 backend/bin/
 backend/data/
+backend/cmd/server/dist/
 
 # Frontend auto-generated
 frontend/src/auto-imports.d.ts
