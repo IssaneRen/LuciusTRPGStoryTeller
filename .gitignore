@@ -1,0 +1,38 @@
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Claude Code local
+CLAUDE.local.md
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# Dependencies
+node_modules/
+vendor/
+
+# Build outputs
+dist/
+build/
+tmp/
+
+# Go
+backend/tmp/
+backend/bin/
+backend/data/
+
+# Frontend auto-generated
+frontend/src/auto-imports.d.ts
+frontend/src/components.d.ts
+
+# Logs
+*.log

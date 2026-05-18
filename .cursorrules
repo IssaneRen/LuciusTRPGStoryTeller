@@ -1,0 +1,5 @@
+参考 AGENTS.md 获取完整项目规范。
+
+本项目是 AI 超级个体全栈项目，采用 Go + Gin 后端和 Vue 3 + Vite + TypeScript 前端。
+知识库使用 markdown 文件管理，每个目录有 README.md 索引。
+详细的 Agent 角色和工作流程见 docs/ 目录。

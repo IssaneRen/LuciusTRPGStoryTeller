@@ -1,0 +1,9 @@
+---
+description: "Go API 开发规范 — 详见 .claude/agents/backend-developer.md"
+globs: "backend/**/*.go"
+---
+
+快速提醒（权威规范在 .claude/agents/backend-developer.md）:
+- Handler 签名: func(c *gin.Context)
+- 错误包装: fmt.Errorf("context: %w", err)
+- 新增端点同步更新接口文档
