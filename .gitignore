@@ -37,5 +37,8 @@ frontend/src/components.d.ts
 web/src/auto-imports.d.ts
 web/src/components.d.ts
 
+# Task artifacts (auto-generated, resumable)
+.tasks/
+
 # Logs
 *.log

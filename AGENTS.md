@@ -11,6 +11,7 @@
 - 工作流程: [docs/workflow.md](docs/workflow.md)
 - Agent 角色定义: [docs/agents.md](docs/agents.md)
 - 使用指南: [guides/README.md](guides/README.md)
+- 全链路交付 Skill: [.claude/skills/full-delivery/SKILL.md](.claude/skills/full-delivery/SKILL.md)
 
 ## 项目结构
 
