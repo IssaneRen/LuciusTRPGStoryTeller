@@ -37,6 +37,11 @@ frontend/src/components.d.ts
 web/src/auto-imports.d.ts
 web/src/components.d.ts
 
+# TypeScript build info
+*.tsbuildinfo
+vite.config.d.ts
+vite.config.js
+
 # Task artifacts (auto-generated, resumable)
 .tasks/
 

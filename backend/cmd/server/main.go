@@ -7,36 +7,33 @@ import (
 	"net/http"
 	"os"
 
-	"lucius-trpg/backend/internal/model"
+	"lucius-trpg/backend/internal/config"
 	"lucius-trpg/backend/internal/router"
 
 	"github.com/gin-gonic/gin"
-	"github.com/glebarez/sqlite"
-	"gorm.io/gorm"
 )
 
 //go:embed dist
 var frontendFS embed.FS
 
 func main() {
+	// Enforce JWT_SECRET in production
 	if os.Getenv("GIN_MODE") == "release" && os.Getenv("JWT_SECRET") == "" {
 		log.Fatal("JWT_SECRET environment variable is required in production")
 	}
 
-	dbPath := os.Getenv("DB_PATH")
-	if dbPath == "" {
-		dbPath = "./data/app.db"
+	// Parse admin users from environment
+	adminUsersRaw := os.Getenv("ADMIN_USERS")
+	adminUsers := config.ParseAdminUsers(adminUsersRaw)
+
+	if len(adminUsers) == 0 {
+		log.Println("WARNING: No admin users configured. Admin endpoints will not be accessible.")
+	} else {
+		log.Printf("Loaded %d admin user(s)", len(adminUsers))
 	}
 
-	os.MkdirAll("./data", 0755)
-
-	db, err := gorm.Open(sqlite.Open(dbPath), &gorm.Config{})
-	if err != nil {
-		log.Fatal("failed to connect database:", err)
-	}
-	db.AutoMigrate(&model.User{})
-
-	r := router.Setup(db)
+	// Setup router
+	r := router.Setup(adminUsers)
 
 	// Serve embedded frontend in production
 	distFS, err := fs.Sub(frontendFS, "dist")

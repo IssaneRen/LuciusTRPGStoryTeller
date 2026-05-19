@@ -15,9 +15,6 @@ import { NButton, NSpace, NCard, NH1, NText } from 'naive-ui'
       <NButton type="primary" size="large" tag="a" href="/about">
         了解更多
       </NButton>
-      <NButton size="large" tag="a" href="http://localhost:5173" target="_blank">
-        进入管理后台
-      </NButton>
     </NSpace>
 
     <div class="mt-16 grid grid-cols-1 md:grid-cols-3 gap-6 max-w-4xl w-full">

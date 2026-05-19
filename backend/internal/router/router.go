@@ -1,15 +1,16 @@
 package router
 
 import (
+	"lucius-trpg/backend/internal/config"
 	"lucius-trpg/backend/internal/handler"
 	"lucius-trpg/backend/internal/middleware"
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
-	"gorm.io/gorm"
 )
 
-func Setup(db *gorm.DB) *gin.Engine {
+// Setup configures and returns the Gin router
+func Setup(adminUsers []config.AdminUser) *gin.Engine {
 	r := gin.Default()
 
 	r.Use(cors.New(cors.Config{
@@ -19,13 +20,30 @@ func Setup(db *gorm.DB) *gin.Engine {
 		AllowCredentials: true,
 	}))
 
-	auth := &handler.AuthHandler{DB: db}
+	adminAuthHandler := &handler.AdminAuthHandler{AdminUsers: adminUsers}
+	userAuthHandler := &handler.UserAuthHandler{}
 
 	api := r.Group("/api")
 	{
-		api.POST("/auth/register", auth.Register)
-		api.POST("/auth/login", auth.Login)
-		api.GET("/auth/me", middleware.JWTAuth(), auth.Me)
+		// Admin routes
+		admin := api.Group("/admin")
+		{
+			adminAuth := admin.Group("/auth")
+			{
+				adminAuth.POST("/login", adminAuthHandler.AdminLogin)
+				adminAuth.GET("/me", middleware.AdminAuth(), adminAuthHandler.AdminMe)
+			}
+		}
+
+		// User routes
+		user := api.Group("/user")
+		{
+			userAuth := user.Group("/auth")
+			{
+				userAuth.POST("/login", userAuthHandler.UserLogin)
+				userAuth.GET("/me", middleware.UserAuth(), userAuthHandler.UserMe)
+			}
+		}
 	}
 
 	return r
