@@ -2,9 +2,12 @@
 
 ## 索引
 
-- [architecture.md](architecture.md) — 系统架构全景
-- [workflow.md](workflow.md) — AI Agent 工作流程
-- [agents.md](agents.md) — Agent 角色定义索引
+| 文档 | 内容 |
+|------|------|
+| [architecture.md](architecture.md) | 系统架构全景图 |
+| [workflow.md](workflow.md) | AI Agent 工作流程 |
+| [agents.md](agents.md) | 8 个 Agent 角色索引 |
+| [decisions/](decisions/README.md) | 架构决策记录 (ADR) |
 
 ## 决策记录
 

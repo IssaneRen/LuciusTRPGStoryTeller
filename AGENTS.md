@@ -24,8 +24,9 @@
 ├── docs/                  # 项目文档（分层索引）
 ├── guides/                # 使用指南（快速开始、部署等）
 ├── knowledge/             # 知识库（md 文件管理）
-├── backend/               # 后端项目（Go + Gin）
-├── frontend/              # 前端项目（Vue 3 + Vite + TS）
+├── backend/               # 后端 API（Go + Gin，:8080）
+├── frontend/              # 管理后台（Vue 3 + Naive UI，:5173）
+├── web/                   # 用户端展示（Vue 3 + Naive UI，:3000）
 ├── Makefile               # 统一任务入口（make help）
 # 以下为规划中的模块，目录在实际启动时创建:
 # - miniprogram/           # 小程序项目（uni-app）

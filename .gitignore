@@ -34,6 +34,8 @@ backend/cmd/server/dist/
 # Frontend auto-generated
 frontend/src/auto-imports.d.ts
 frontend/src/components.d.ts
+web/src/auto-imports.d.ts
+web/src/components.d.ts
 
 # Logs
 *.log
