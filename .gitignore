@@ -28,7 +28,8 @@ tmp/
 # Go
 backend/tmp/
 backend/bin/
-backend/data/
+backend/data/app.db
+!backend/data/graphs/
 backend/cmd/server/dist/
 
 # Frontend auto-generated
