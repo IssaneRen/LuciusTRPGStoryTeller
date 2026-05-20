@@ -3,7 +3,7 @@ import { ref, computed, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
 import { NCard, NSpin, NButton, NSpace, NTag } from 'naive-ui'
 import { useMessage } from 'naive-ui'
-import axios from 'axios'
+import request from '@/utils/request'
 import GraphView from '@/components/graph/GraphView.vue'
 
 const route = useRoute()
@@ -11,8 +11,8 @@ const message = useMessage()
 
 const loading = ref(true)
 const graphData = ref<{
-  nodes: Array<{ id: string; data: any }>
-  edges: Array<{ id: string; source: string; target: string }>
+  nodes: Array<{ id: string; data: { label: string; tags: string[]; description: string } }>
+  edges: Array<{ id: string; source: string; target: string; label?: string }>
 } | null>(null)
 const selectedTags = ref<string[]>([])
 
@@ -31,11 +31,19 @@ async function fetchGraphData() {
   loading.value = true
   try {
     const graphId = route.params.id as string
-    const response = await axios.get(`/api/graphs/${graphId}`)
-    graphData.value = response.data
+    const res = await request.get(`/graphs/${graphId}`)
+    const raw = res.data.data
+    graphData.value = {
+      nodes: raw.nodes.map((n: any) => ({
+        id: n.id,
+        data: { label: n.label, tags: n.tags || [], description: n.description || '' }
+      })),
+      edges: raw.edges.map((e: any) => ({
+        id: e.id, source: e.source, target: e.target, label: e.label
+      }))
+    }
   } catch (error: any) {
-    message.error(error.response?.data?.error || '加载图数据失败')
-    console.error('Failed to load graph:', error)
+    message.error('加载图数据失败')
   } finally {
     loading.value = false
   }
