@@ -68,7 +68,7 @@ async function loadGraphs() {
   }
 }
 
-function handleEdit(id: number) {
+function handleEdit(id: string) {
   router.push(`/graph/${id}/edit`)
 }
 

@@ -12,7 +12,7 @@ const route = useRoute()
 const router = useRouter()
 const message = useMessage()
 
-const graphId = computed(() => Number(route.params.id))
+const graphId = computed(() => route.params.id as string)
 const graph = ref<Graph | null>(null)
 const loading = ref(false)
 
@@ -32,10 +32,10 @@ async function loadGraph() {
     const res = await graphApi.get(graphId.value)
     graph.value = res.data.data
 
-    nodes.value = (res.data.data.nodes || []).map((n) => ({
+    nodes.value = (res.data.data.nodes || []).map((n: any) => ({
       id: n.id,
       type: 'default',
-      position: n.position,
+      position: { x: n.x ?? n.position?.x ?? 0, y: n.y ?? n.position?.y ?? 0 },
       label: n.label,
       data: {
         label: n.label,
@@ -139,12 +139,13 @@ async function handleSave() {
   if (!graph.value) return
 
   try {
-    const graphNodes: GraphNode[] = nodes.value.map((n) => ({
+    const graphNodes = nodes.value.map((n) => ({
       id: n.id,
       label: n.data.label || n.label || '',
       description: n.data.description || '',
       tags: n.data.tags || [],
-      position: n.position,
+      x: n.position.x,
+      y: n.position.y,
     }))
 
     const graphEdges = edges.value.map((e) => ({

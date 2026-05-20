@@ -1,13 +1,12 @@
 import { api } from '@/utils/request'
 
 export interface Graph {
-  id: number
+  id: string
   name: string
   type: 'clue' | 'module'
   nodes: GraphNode[]
   edges: GraphEdge[]
-  createdAt: string
-  updatedAt: string
+  nodeCount?: number
 }
 
 export interface GraphNode {
@@ -32,8 +31,8 @@ export interface CreateGraphInput {
 export interface UpdateGraphInput {
   name?: string
   type?: 'clue' | 'module'
-  nodes?: GraphNode[]
-  edges?: GraphEdge[]
+  nodes?: Array<{ id: string; label: string; description?: string; tags?: string[]; x: number; y: number }>
+  edges?: Array<{ id: string; source: string; target: string; label?: string }>
 }
 
 interface ApiResponse<T> {
@@ -44,8 +43,8 @@ interface ApiResponse<T> {
 
 export const graphApi = {
   list: () => api.get<ApiResponse<Graph[]>>('/api/graphs'),
-  get: (id: number) => api.get<ApiResponse<Graph>>(`/api/graphs/${id}`),
-  create: (data: CreateGraphInput) => api.post<ApiResponse<Graph>>('/api/graphs', data),
-  update: (id: number, data: UpdateGraphInput) => api.put<ApiResponse<Graph>>(`/api/graphs/${id}`, data),
-  delete: (id: number) => api.delete<ApiResponse<null>>(`/api/graphs/${id}`),
+  get: (id: string) => api.get<ApiResponse<Graph>>(`/api/graphs/${id}`),
+  create: (data: CreateGraphInput) => api.post<ApiResponse<{ id: string }>>('/api/graphs', data),
+  update: (id: string, data: UpdateGraphInput) => api.put<ApiResponse<null>>(`/api/graphs/${id}`, data),
+  delete: (id: string) => api.delete<ApiResponse<null>>(`/api/graphs/${id}`),
 }
