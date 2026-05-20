@@ -9,6 +9,7 @@ dev: ## 启动完整开发环境 (后端+管理后台+用户端)
 
 dev-backend: ## 启动后端 API (:8080)
 	@mkdir -p backend/cmd/server/dist && touch backend/cmd/server/dist/index.html
+	@test -f backend/.env && export $$(grep -v '^#' backend/.env | xargs) || true; \
 	cd backend && go run ./cmd/server
 
 dev-admin: ## 启动管理后台 (:5173)
