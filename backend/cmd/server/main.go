@@ -22,6 +22,11 @@ func main() {
 		log.Fatal("JWT_SECRET environment variable is required in production")
 	}
 
+	// Ensure data directories exist
+	if err := os.MkdirAll("data/graphs", 0755); err != nil {
+		log.Fatalf("Failed to create data/graphs directory: %v", err)
+	}
+
 	// Parse admin users from environment
 	adminUsersRaw := os.Getenv("ADMIN_USERS")
 	adminUsers := config.ParseAdminUsers(adminUsersRaw)

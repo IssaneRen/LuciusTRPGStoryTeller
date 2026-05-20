@@ -10,6 +10,7 @@ const user = useUserStore()
 
 const menuOptions: MenuOption[] = [
   { label: '仪表盘', key: '/dashboard' },
+  { label: '图管理', key: '/graph' },
 ]
 
 function handleMenuClick(key: string) {

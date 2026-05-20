@@ -17,6 +17,9 @@ import { NButton, NCard, NText, NSpace } from 'naive-ui'
         <NButton type="primary" size="large" round tag="a" href="/about">
           了解更多
         </NButton>
+        <NButton size="large" round tag="a" href="/graph/clue-demo">
+          查看关系图
+        </NButton>
       </NSpace>
     </div>
 

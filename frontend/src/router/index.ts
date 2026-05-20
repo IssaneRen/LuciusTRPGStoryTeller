@@ -15,6 +15,8 @@ const router = createRouter({
       children: [
         { path: '', redirect: '/dashboard' },
         { path: 'dashboard', component: () => import('@/views/dashboard/index.vue') },
+        { path: 'graph', component: () => import('@/views/graph/list.vue') },
+        { path: 'graph/:id/edit', component: () => import('@/views/graph/editor.vue') },
       ],
     },
   ],

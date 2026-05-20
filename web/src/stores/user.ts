@@ -7,6 +7,7 @@ interface LoginResponse {
   data: {
     token: string
   }
+  message?: string
 }
 
 interface MeResponse {

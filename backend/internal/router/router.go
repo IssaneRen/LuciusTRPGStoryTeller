@@ -22,9 +22,23 @@ func Setup(adminUsers []config.AdminUser) *gin.Engine {
 
 	adminAuthHandler := &handler.AdminAuthHandler{AdminUsers: adminUsers}
 	userAuthHandler := &handler.UserAuthHandler{}
+	graphHandler := &handler.GraphHandler{}
 
 	api := r.Group("/api")
 	{
+		// Public graph routes
+		api.GET("/graphs", graphHandler.ListGraphs)
+		api.GET("/graphs/:id", graphHandler.GetGraph)
+
+		// Protected graph write operations (require admin)
+		adminGraphs := api.Group("/graphs")
+		adminGraphs.Use(middleware.AdminAuth())
+		{
+			adminGraphs.POST("", graphHandler.CreateGraph)
+			adminGraphs.PUT("/:id", graphHandler.UpdateGraph)
+			adminGraphs.DELETE("/:id", graphHandler.DeleteGraph)
+		}
+
 		// Admin routes
 		admin := api.Group("/admin")
 		{
