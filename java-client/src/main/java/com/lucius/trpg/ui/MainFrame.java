@@ -161,10 +161,14 @@ public class MainFrame extends JFrame {
 
         controlPanel.add(controlContent);
 
-        // 可选规则面板
-        JPanel rulesPanel = createCardPanel("可选规则");
+        // 可选规则面板（可折叠）
+        JPanel rulesPanel = new JPanel(new BorderLayout());
+        rulesPanel.setBackground(UIConstants.BG_CARD);
+        rulesPanel.setBorder(BorderFactory.createLineBorder(UIConstants.BORDER, 1));
+
         JPanel rulesGrid = new JPanel(new GridLayout(0, 1, 0, 2));
         rulesGrid.setBackground(UIConstants.BG_CARD);
+        rulesGrid.setBorder(new EmptyBorder(4, 8, 4, 8));
         for (int i = 0; i < CombatOptions.NAMES.length; i++) {
             final int idx = i;
             JCheckBox cb = new JCheckBox(CombatOptions.NAMES[i]);
@@ -177,16 +181,43 @@ public class MainFrame extends JFrame {
             optionCheckboxes[i] = cb;
             rulesGrid.add(cb);
         }
-        rulesPanel.add(rulesGrid);
 
-        leftPanel.add(pcPanel);
-        leftPanel.add(Box.createVerticalStrut(UIConstants.PADDING));
-        leftPanel.add(enemyPanel);
-        leftPanel.add(Box.createVerticalStrut(UIConstants.PADDING));
-        leftPanel.add(rulesPanel);
-        leftPanel.add(Box.createVerticalStrut(UIConstants.PADDING));
-        leftPanel.add(controlPanel);
-        leftPanel.add(Box.createVerticalGlue());
+        JButton toggleRulesBtn = new JButton("▼ 可选规则");
+        toggleRulesBtn.setFont(UIConstants.SMALL_FONT);
+        toggleRulesBtn.setForeground(UIConstants.TEXT_SECONDARY);
+        toggleRulesBtn.setBackground(UIConstants.BG_CARD);
+        toggleRulesBtn.setBorderPainted(false);
+        toggleRulesBtn.setFocusPainted(false);
+        toggleRulesBtn.setHorizontalAlignment(SwingConstants.LEFT);
+        toggleRulesBtn.addActionListener(e -> {
+            boolean visible = !rulesGrid.isVisible();
+            rulesGrid.setVisible(visible);
+            toggleRulesBtn.setText((visible ? "▼" : "▶") + " 可选规则");
+            revalidate();
+        });
+
+        rulesPanel.add(toggleRulesBtn, BorderLayout.NORTH);
+        rulesPanel.add(rulesGrid, BorderLayout.CENTER);
+        rulesGrid.setVisible(false); // 默认折叠
+
+        // 左侧用 ScrollPane 包裹，确保底部不被压缩
+        JPanel leftContent = new JPanel();
+        leftContent.setLayout(new BoxLayout(leftContent, BoxLayout.Y_AXIS));
+        leftContent.setBackground(UIConstants.BG_DARK);
+        leftContent.add(pcPanel);
+        leftContent.add(Box.createVerticalStrut(UIConstants.PADDING_SMALL));
+        leftContent.add(enemyPanel);
+        leftContent.add(Box.createVerticalStrut(UIConstants.PADDING_SMALL));
+        leftContent.add(rulesPanel);
+        leftContent.add(Box.createVerticalStrut(UIConstants.PADDING_SMALL));
+        leftContent.add(controlPanel);
+
+        JScrollPane leftScroll = new JScrollPane(leftContent);
+        leftScroll.setPreferredSize(new Dimension(420, 0));
+        leftScroll.setBorder(null);
+        leftScroll.getViewport().setBackground(UIConstants.BG_DARK);
+        leftScroll.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+        leftPanel.add(leftScroll);
 
         // 右侧面板
         JPanel rightPanel = new JPanel(new BorderLayout(0, UIConstants.PADDING));
@@ -214,17 +245,23 @@ public class MainFrame extends JFrame {
         // 战斗日志区
         JPanel logPanel = createCardPanel("战斗日志");
 
-        logPane = new JTextPane();
+        logPane = new JTextPane() {
+            @Override
+            public boolean getScrollableTracksViewportWidth() {
+                return false; // 不自动换行，启用横向滚动
+            }
+        };
         logPane.setEditable(false);
         logPane.setBackground(UIConstants.BG_DARK);
         logPane.setForeground(UIConstants.TEXT_PRIMARY);
-        logPane.setFont(UIConstants.SMALL_FONT);
+        logPane.setFont(new Font("Monospaced", Font.PLAIN, 12));
         logPane.setCaretColor(UIConstants.TEXT_PRIMARY);
 
         logDoc = logPane.getStyledDocument();
         initLogStyles();
 
         JScrollPane logScrollPane = new JScrollPane(logPane);
+        logScrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
         styleScrollPane(logScrollPane);
 
         JPanel logButtonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, UIConstants.PADDING_SMALL, UIConstants.PADDING_SMALL));

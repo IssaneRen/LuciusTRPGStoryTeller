@@ -32,12 +32,21 @@ public class CombatEngine {
         List<Character> allCombatants = new ArrayList<>();
         allCombatants.addAll(pcs);
         allCombatants.addAll(enemies);
-        allCombatants.sort(Comparator.comparingInt(Character::getDex).reversed());
+
+        // 先攻排序：有准备好的枪械的角色 DEX+50
+        allCombatants.sort((a, b) -> {
+            int aInit = getInitiative(a, pcs.contains(a));
+            int bInit = getInitiative(b, pcs.contains(b));
+            return Integer.compare(bInit, aInit);
+        });
 
         result.addLog("=== 战斗开始 ===");
         result.addLog("调查员: " + pcs.stream().map(Character::getName).collect(Collectors.joining(", ")));
         result.addLog("敌人: " + enemies.stream().map(Character::getName).collect(Collectors.joining(", ")));
         result.addLog("启用规则: " + getEnabledRulesDisplay());
+        result.addLog("先攻顺序: " + allCombatants.stream()
+                .map(c -> c.getName() + "(DEX" + c.getDex() + (hasReadiedFirearm(c, pcs.contains(c)) ? "+50" : "") + ")")
+                .collect(Collectors.joining(" → ")));
         result.addLog("");
 
         int round = 0;
@@ -150,8 +159,11 @@ public class CombatEngine {
 
         DiceRoll.CheckResult attackResult = DiceRoll.checkResult(attackRoll, skillValue);
 
+        String initTag = String.format("[%s DEX%d%s]",
+                attacker.getName(), attacker.getDex(),
+                (!weapon.isMelee() && weapon.hasAmmo()) ? "+50先发" : "");
         result.addLog(String.format("%s 使用 %s 攻击 %s (技能%d, 骰子%d, %s)",
-                attacker.getName(), weapon.getName(), defender.getName(),
+                initTag, weapon.getName(), defender.getName(),
                 skillValue, attackRoll, DiceRoll.getResultDescription(attackResult)));
 
         if (attackResult == DiceRoll.CheckResult.FAIL || attackResult == DiceRoll.CheckResult.FUMBLE) {
@@ -253,6 +265,18 @@ public class CombatEngine {
                 int skill = actor.getSkill(w.getSkillName());
                 return skill < 50 && DiceRoll.rollD100() > 70;
             }
+        }
+        return false;
+    }
+
+    private int getInitiative(Character c, boolean isPC) {
+        return c.getDex() + (hasReadiedFirearm(c, isPC) ? 50 : 0);
+    }
+
+    private boolean hasReadiedFirearm(Character c, boolean isPC) {
+        if (!isPC) return false;
+        for (Weapon w : c.getWeapons()) {
+            if (!w.isMelee() && w.hasAmmo()) return true;
         }
         return false;
     }
