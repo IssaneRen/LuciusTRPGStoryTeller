@@ -2,6 +2,11 @@
 .DS_Store
 Thumbs.db
 
+# Gradle
+.gradle/
+java-client/.gradle/
+java-client/build/
+
 # IDE
 .idea/
 .vscode/
