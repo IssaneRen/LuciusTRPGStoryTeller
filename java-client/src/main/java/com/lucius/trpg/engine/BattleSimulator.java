@@ -45,6 +45,17 @@ public class BattleSimulator {
             totalRounds += result.getRounds();
             totalSurvivors += result.getPcSurvivors();
 
+            // 打标签
+            String tag;
+            if ("enemy".equals(result.getWinner())) {
+                tag = "团灭";
+            } else if (result.getPcSurvivors() == result.getTotalPCs()) {
+                tag = "全员存活";
+            } else {
+                tag = "部分死亡";
+            }
+            report.addTaggedLog(tag, result.getLogs());
+
             if ("pc".equals(result.getWinner())) {
                 pcWins++;
             } else {

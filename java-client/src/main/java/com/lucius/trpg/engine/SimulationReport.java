@@ -7,16 +7,42 @@ import java.util.List;
  * 批量模拟报告
  */
 public class SimulationReport {
-    private int totalRuns;          // 总模拟次数
-    private int pcWins;             // PC胜利次数
-    private int enemyWins;          // 敌人胜利次数
-    private double avgRounds;       // 平均回合数
-    private double survivalRate;    // 存活率（百分比）
-    private int difficultyRating;   // 难度评级（1-5星）
-    private List<String> sampleLog; // 样本战斗日志
+    private int totalRuns;
+    private int pcWins;
+    private int enemyWins;
+    private double avgRounds;
+    private double survivalRate;
+    private int difficultyRating;
+    private List<String> sampleLog;
+
+    // 每次战斗的标签化日志: "团灭" / "全员存活" / "部分死亡"
+    private List<TaggedLog> allLogs = new ArrayList<>();
 
     public SimulationReport() {
         this.sampleLog = new ArrayList<>();
+    }
+
+    public void addTaggedLog(String tag, List<String> log) {
+        allLogs.add(new TaggedLog(tag, log));
+    }
+
+    public List<TaggedLog> getAllLogs() { return allLogs; }
+
+    public List<TaggedLog> getLogsByTag(String tag) {
+        List<TaggedLog> result = new ArrayList<>();
+        for (TaggedLog tl : allLogs) {
+            if (tl.tag.equals(tag)) result.add(tl);
+        }
+        return result;
+    }
+
+    public static class TaggedLog {
+        public final String tag;
+        public final List<String> lines;
+        public TaggedLog(String tag, List<String> lines) {
+            this.tag = tag;
+            this.lines = lines;
+        }
     }
 
     /**

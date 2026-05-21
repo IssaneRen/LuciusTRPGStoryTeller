@@ -13,20 +13,32 @@ public class CharacterStore {
     private static final String DATA_DIR = "data/characters";
     private static final String PC_FILE = DATA_DIR + "/investigators.json";
     private static final String ENEMY_FILE = DATA_DIR + "/enemies.json";
+    private static final String WORKSPACE_PC = DATA_DIR + "/workspace_pcs.json";
+    private static final String WORKSPACE_ENEMY = DATA_DIR + "/workspace_enemies.json";
     private static final Gson gson = new GsonBuilder().setPrettyPrinting().create();
 
     public static void save(List<Character> pcs, List<Character> enemies) {
         ensureDir();
-        writeFile(PC_FILE, pcs);
-        writeFile(ENEMY_FILE, enemies);
+        writeFile(WORKSPACE_PC, pcs);
+        writeFile(WORKSPACE_ENEMY, enemies);
     }
 
     public static List<Character> loadPCs() {
-        return readFile(PC_FILE);
+        List<Character> workspace = readFile(WORKSPACE_PC);
+        return workspace.isEmpty() ? readFile(PC_FILE) : workspace;
     }
 
     public static List<Character> loadEnemies() {
+        List<Character> workspace = readFile(WORKSPACE_ENEMY);
+        return workspace;
+    }
+
+    public static List<Character> loadPresetEnemies() {
         return readFile(ENEMY_FILE);
+    }
+
+    public static List<Character> loadPresetPCs() {
+        return readFile(PC_FILE);
     }
 
     private static void ensureDir() {

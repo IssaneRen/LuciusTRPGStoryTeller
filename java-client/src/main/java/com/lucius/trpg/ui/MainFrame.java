@@ -27,6 +27,7 @@ public class MainFrame extends JFrame {
     private final List<Character> pcList = new ArrayList<>();
     private final List<Character> enemyList = new ArrayList<>();
     private final CombatOptions combatOptions = new CombatOptions();
+    private SimulationReport lastReport = null;
     private final JCheckBox[] optionCheckboxes = new JCheckBox[CombatOptions.NAMES.length];
 
     // 左侧面板组件
@@ -92,7 +93,10 @@ public class MainFrame extends JFrame {
         removePcButton.addActionListener(e -> removeCharacter(true));
         JButton editPcButton = createButton("编辑");
         editPcButton.addActionListener(e -> editCharacter(true));
+        JButton presetPcButton = createButton("预设调查员");
+        presetPcButton.addActionListener(e -> showPresetPcMenu());
         pcButtonPanel.add(addPcButton);
+        pcButtonPanel.add(presetPcButton);
         pcButtonPanel.add(randomPcButton);
         pcButtonPanel.add(editPcButton);
         pcButtonPanel.add(removePcButton);
@@ -200,10 +204,20 @@ public class MainFrame extends JFrame {
         rulesPanel.add(rulesGrid, BorderLayout.CENTER);
         rulesGrid.setVisible(false); // 默认折叠
 
-        // 左侧用 ScrollPane 包裹，确保底部不被压缩
+        // 左侧内容面板 - 固定宽度对齐
         JPanel leftContent = new JPanel();
         leftContent.setLayout(new BoxLayout(leftContent, BoxLayout.Y_AXIS));
         leftContent.setBackground(UIConstants.BG_DARK);
+
+        pcPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
+        pcPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, 260));
+        enemyPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
+        enemyPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, 260));
+        rulesPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
+        rulesPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, 300));
+        controlPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
+        controlPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, 100));
+
         leftContent.add(pcPanel);
         leftContent.add(Box.createVerticalStrut(UIConstants.PADDING_SMALL));
         leftContent.add(enemyPanel);
@@ -244,6 +258,26 @@ public class MainFrame extends JFrame {
 
         // 战斗日志区
         JPanel logPanel = createCardPanel("战斗日志");
+
+        // Tag 筛选按钮栏
+        JPanel tagFilterPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 4, 2));
+        tagFilterPanel.setBackground(UIConstants.BG_CARD);
+        JLabel tagLabel = new JLabel("筛选:");
+        tagLabel.setForeground(UIConstants.TEXT_SECONDARY);
+        tagLabel.setFont(UIConstants.SMALL_FONT);
+        tagFilterPanel.add(tagLabel);
+        String[] tags = {"全部", "团灭", "全员存活", "部分死亡"};
+        for (String tag : tags) {
+            JButton tagBtn = new JButton(tag);
+            tagBtn.setFont(UIConstants.SMALL_FONT);
+            tagBtn.setForeground(UIConstants.TEXT_PRIMARY);
+            tagBtn.setBackground(UIConstants.BG_DARK);
+            tagBtn.setBorderPainted(false);
+            tagBtn.setFocusPainted(false);
+            tagBtn.addActionListener(e -> filterLogByTag(tag));
+            tagFilterPanel.add(tagBtn);
+        }
+        logPanel.add(tagFilterPanel);
 
         logPane = new JTextPane() {
             @Override
@@ -499,48 +533,138 @@ public class MainFrame extends JFrame {
     }
 
     private void removeCharacter(boolean isPc) {
-        if (isPc) {
-            int selectedRow = pcTable.getSelectedRow();
-            if (selectedRow >= 0) {
-                pcList.remove(selectedRow);
-                refreshPcTable();
-            }
-        } else {
-            int selectedRow = enemyTable.getSelectedRow();
-            if (selectedRow >= 0) {
-                enemyList.remove(selectedRow);
-                refreshEnemyTable();
-            }
+        JTable table = isPc ? pcTable : enemyTable;
+        List<Character> list = isPc ? pcList : enemyList;
+        int[] rows = table.getSelectedRows();
+        if (rows.length == 0) {
+            JOptionPane.showMessageDialog(this, "请先选中要删除的角色（支持Ctrl/Shift多选）", "提示", JOptionPane.WARNING_MESSAGE);
+            return;
         }
+        // 从后往前删除避免索引错位
+        for (int i = rows.length - 1; i >= 0; i--) {
+            list.remove(rows[i]);
+        }
+        if (isPc) refreshPcTable(); else refreshEnemyTable();
     }
 
     private void showPresetMenu(JButton button) {
-        JPopupMenu menu = new JPopupMenu();
-        menu.setBackground(UIConstants.BG_CARD);
-        menu.setBorder(BorderFactory.createLineBorder(UIConstants.BORDER, 1));
-
-        // 从保存的 enemies.json 加载所有预设
-        List<Character> presets = CharacterStore.loadEnemies();
+        List<Character> presets = CharacterStore.loadPresetEnemies();
         if (presets.isEmpty()) {
-            JMenuItem empty = new JMenuItem("(无预设怪物)");
-            empty.setEnabled(false);
-            menu.add(empty);
-        } else {
-            for (Character preset : presets) {
-                JMenuItem item = new JMenuItem(String.format("%s (HP:%d 格斗:%d 护甲:%d)",
-                        preset.getName(), preset.getMaxHp(), preset.getSkill("格斗"), preset.getArmor()));
-                item.setBackground(UIConstants.BG_CARD);
-                item.setForeground(UIConstants.TEXT_PRIMARY);
-                item.setFont(UIConstants.SMALL_FONT);
-                item.addActionListener(e -> {
-                    enemyList.add(preset);
-                    refreshEnemyTable();
-                });
-                menu.add(item);
-            }
+            JOptionPane.showMessageDialog(this, "无预设怪物", "提示", JOptionPane.INFORMATION_MESSAGE);
+            return;
         }
 
-        menu.show(button, 0, button.getHeight());
+        JDialog dialog = new JDialog(this, "批量添加预设怪物", false);
+        dialog.setSize(400, 500);
+        dialog.setLocationRelativeTo(this);
+
+        JPanel panel = new JPanel(new BorderLayout(0, 8));
+        panel.setBackground(UIConstants.BG_DARK);
+        panel.setBorder(new EmptyBorder(12, 12, 12, 12));
+
+        JLabel hint = new JLabel("点击即添加，可重复点击添加多个");
+        hint.setForeground(UIConstants.TEXT_SECONDARY);
+        hint.setFont(UIConstants.SMALL_FONT);
+        panel.add(hint, BorderLayout.NORTH);
+
+        JPanel listPanel = new JPanel(new GridLayout(0, 1, 0, 4));
+        listPanel.setBackground(UIConstants.BG_DARK);
+
+        for (Character preset : presets) {
+            JButton btn = new JButton(String.format("%s  HP:%d  格斗:%d  护甲:%d",
+                    preset.getName(), preset.getMaxHp(), preset.getSkill("格斗"), preset.getArmor()));
+            btn.setFont(UIConstants.SMALL_FONT);
+            btn.setForeground(UIConstants.TEXT_PRIMARY);
+            btn.setBackground(UIConstants.BG_CARD);
+            btn.setBorderPainted(false);
+            btn.setHorizontalAlignment(SwingConstants.LEFT);
+            btn.addActionListener(e -> {
+                enemyList.add(cloneCharacter(preset));
+                refreshEnemyTable();
+                btn.setText("✓ " + btn.getText().replaceFirst("^✓ ", ""));
+            });
+            listPanel.add(btn);
+        }
+
+        JScrollPane scroll = new JScrollPane(listPanel);
+        scroll.setBorder(null);
+        scroll.getViewport().setBackground(UIConstants.BG_DARK);
+        panel.add(scroll, BorderLayout.CENTER);
+
+        JButton closeBtn = new JButton("完成");
+        closeBtn.setFont(UIConstants.BODY_FONT);
+        closeBtn.setForeground(Color.WHITE);
+        closeBtn.setBackground(UIConstants.PRIMARY);
+        closeBtn.setBorderPainted(false);
+        closeBtn.addActionListener(e -> dialog.dispose());
+        JPanel bottomPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+        bottomPanel.setBackground(UIConstants.BG_DARK);
+        bottomPanel.add(closeBtn);
+        panel.add(bottomPanel, BorderLayout.SOUTH);
+
+        dialog.setContentPane(panel);
+        dialog.setVisible(true);
+    }
+
+    private void showPresetPcMenu() {
+        List<Character> presets = CharacterStore.loadPresetPCs();
+        if (presets.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "无预设调查员", "提示", JOptionPane.INFORMATION_MESSAGE);
+            return;
+        }
+        JDialog dialog = new JDialog(this, "批量添加预设调查员", false);
+        dialog.setSize(400, 400);
+        dialog.setLocationRelativeTo(this);
+        JPanel panel = new JPanel(new BorderLayout(0, 8));
+        panel.setBackground(UIConstants.BG_DARK);
+        panel.setBorder(new EmptyBorder(12, 12, 12, 12));
+        JLabel hint = new JLabel("点击即添加，可重复点击");
+        hint.setForeground(UIConstants.TEXT_SECONDARY);
+        hint.setFont(UIConstants.SMALL_FONT);
+        panel.add(hint, BorderLayout.NORTH);
+        JPanel listPanel = new JPanel(new GridLayout(0, 1, 0, 4));
+        listPanel.setBackground(UIConstants.BG_DARK);
+        for (Character preset : presets) {
+            JButton btn = new JButton(String.format("%s  HP:%d  格斗:%d", preset.getName(), preset.getMaxHp(), preset.getSkill("格斗")));
+            btn.setFont(UIConstants.SMALL_FONT);
+            btn.setForeground(UIConstants.TEXT_PRIMARY);
+            btn.setBackground(UIConstants.BG_CARD);
+            btn.setBorderPainted(false);
+            btn.setHorizontalAlignment(SwingConstants.LEFT);
+            btn.addActionListener(e -> {
+                pcList.add(cloneCharacter(preset));
+                refreshPcTable();
+            });
+            listPanel.add(btn);
+        }
+        JScrollPane scroll = new JScrollPane(listPanel);
+        scroll.setBorder(null);
+        scroll.getViewport().setBackground(UIConstants.BG_DARK);
+        panel.add(scroll, BorderLayout.CENTER);
+        JButton closeBtn = new JButton("完成");
+        closeBtn.setBackground(UIConstants.PRIMARY);
+        closeBtn.setForeground(Color.WHITE);
+        closeBtn.setBorderPainted(false);
+        closeBtn.addActionListener(e -> dialog.dispose());
+        JPanel bp = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+        bp.setBackground(UIConstants.BG_DARK);
+        bp.add(closeBtn);
+        panel.add(bp, BorderLayout.SOUTH);
+        dialog.setContentPane(panel);
+        dialog.setVisible(true);
+    }
+
+    private Character cloneCharacter(Character src) {
+        Character c = new Character(src.getName(), src.getStr(), src.getCon(), src.getSiz(),
+                src.getDex(), src.getIntelligence(), src.getPow(), src.getApp(), src.getEdu());
+        for (Map.Entry<String, Integer> e : src.getSkills().entrySet()) {
+            c.addSkill(e.getKey(), e.getValue());
+        }
+        for (com.lucius.trpg.model.Weapon w : src.getWeapons()) {
+            c.addWeapon(new com.lucius.trpg.model.Weapon(w.getName(), w.getSkillName(), w.getDamage(), w.getRange(), w.getRateOfFire(), w.getAmmo()));
+        }
+        c.setArmor(src.getArmor());
+        return c;
     }
 
     private void refreshPcTable() {
@@ -593,11 +717,15 @@ public class MainFrame extends JFrame {
             protected void done() {
                 try {
                     SimulationReport report = get();
+                    lastReport = report;
                     updateResults(report);
                     if (report.getSampleLog() != null && !report.getSampleLog().isEmpty()) {
                         appendLog(report.getSampleLog(), defaultStyle);
                     }
-                    appendLog("\n模拟完成!\n", successStyle);
+                    int tpk = report.getLogsByTag("团灭").size();
+                    int allSurv = report.getLogsByTag("全员存活").size();
+                    int partial = report.getLogsByTag("部分死亡").size();
+                    appendLog(String.format("\n模拟完成! 团灭:%d 全员存活:%d 部分死亡:%d\n", tpk, allSurv, partial), successStyle);
                 } catch (Exception e) {
                     appendLog("模拟出错: " + e.getMessage() + "\n", dangerStyle);
                     e.printStackTrace();
@@ -629,6 +757,28 @@ public class MainFrame extends JFrame {
     private void appendLog(List<String> lines, AttributeSet style) {
         for (String line : lines) {
             appendLog(line + "\n", style);
+        }
+    }
+
+    private void filterLogByTag(String tag) {
+        if (lastReport == null) return;
+        clearLog();
+        List<SimulationReport.TaggedLog> logs;
+        if ("全部".equals(tag)) {
+            logs = lastReport.getAllLogs();
+        } else {
+            logs = lastReport.getLogsByTag(tag);
+        }
+        if (logs.isEmpty()) {
+            appendLog("没有符合 [" + tag + "] 的战斗记录\n", warningStyle);
+            return;
+        }
+        appendLog(String.format("筛选 [%s]: 共 %d 场\n\n", tag, logs.size()), successStyle);
+        // 只显示第一场详细日志
+        SimulationReport.TaggedLog first = logs.get(0);
+        appendLog(first.lines, defaultStyle);
+        if (logs.size() > 1) {
+            appendLog(String.format("\n... 还有 %d 场同类战斗日志，导出后可查看完整记录\n", logs.size() - 1), warningStyle);
         }
     }
 
