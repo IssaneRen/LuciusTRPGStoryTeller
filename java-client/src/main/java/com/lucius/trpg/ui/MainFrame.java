@@ -3,6 +3,7 @@ package com.lucius.trpg.ui;
 import com.lucius.trpg.engine.BattleSimulator;
 import com.lucius.trpg.engine.SimulationReport;
 import com.lucius.trpg.model.Character;
+import com.lucius.trpg.model.CharacterStore;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -86,8 +87,11 @@ public class MainFrame extends JFrame {
         randomPcButton.addActionListener(e -> addRandomCharacter(true));
         JButton removePcButton = createButton("移除选中");
         removePcButton.addActionListener(e -> removeCharacter(true));
+        JButton editPcButton = createButton("编辑");
+        editPcButton.addActionListener(e -> editCharacter(true));
         pcButtonPanel.add(addPcButton);
         pcButtonPanel.add(randomPcButton);
+        pcButtonPanel.add(editPcButton);
         pcButtonPanel.add(removePcButton);
 
         pcPanel.add(pcScrollPane);
@@ -115,8 +119,11 @@ public class MainFrame extends JFrame {
         presetButton.addActionListener(e -> showPresetMenu(presetButton));
         JButton removeEnemyButton = createButton("移除选中");
         removeEnemyButton.addActionListener(e -> removeCharacter(false));
+        JButton editEnemyButton = createButton("编辑");
+        editEnemyButton.addActionListener(e -> editCharacter(false));
         enemyButtonPanel.add(addEnemyButton);
         enemyButtonPanel.add(presetButton);
+        enemyButtonPanel.add(editEnemyButton);
         enemyButtonPanel.add(removeEnemyButton);
 
         enemyPanel.add(enemyScrollPane);
@@ -139,10 +146,15 @@ public class MainFrame extends JFrame {
         startButton.setPreferredSize(UIConstants.LARGE_BUTTON_SIZE);
         startButton.addActionListener(e -> startSimulation());
 
+        JButton saveButton = createButton("保存配置");
+        saveButton.addActionListener(e -> saveCharacters());
+
         controlContent.add(simLabel);
         controlContent.add(simulationSpinner);
         controlContent.add(Box.createHorizontalStrut(UIConstants.PADDING));
         controlContent.add(startButton);
+        controlContent.add(Box.createHorizontalStrut(UIConstants.PADDING_SMALL));
+        controlContent.add(saveButton);
 
         controlPanel.add(controlContent);
 
@@ -211,6 +223,60 @@ public class MainFrame extends JFrame {
         mainPanel.add(rightPanel, BorderLayout.CENTER);
 
         setContentPane(mainPanel);
+
+        // 启动时加载持久化角色
+        loadSavedCharacters();
+    }
+
+    private void loadSavedCharacters() {
+        List<Character> savedPCs = CharacterStore.loadPCs();
+        for (Character pc : savedPCs) {
+            pcList.add(pc);
+            pcTableModel.addRow(new Object[]{
+                    pc.getName(),
+                    pc.getMaxHp(),
+                    getMainSkillDisplay(pc)
+            });
+        }
+        List<Character> savedEnemies = CharacterStore.loadEnemies();
+        for (Character enemy : savedEnemies) {
+            enemyList.add(enemy);
+            enemyTableModel.addRow(new Object[]{
+                    enemy.getName(),
+                    enemy.getMaxHp(),
+                    getMainSkillDisplay(enemy)
+            });
+        }
+    }
+
+    private void saveCharacters() {
+        CharacterStore.save(pcList, enemyList);
+        JOptionPane.showMessageDialog(this, "配置已保存", "提示", JOptionPane.INFORMATION_MESSAGE);
+    }
+
+    private void editCharacter(boolean isPc) {
+        JTable table = isPc ? pcTable : enemyTable;
+        List<Character> list = isPc ? pcList : enemyList;
+        int row = table.getSelectedRow();
+        if (row < 0) {
+            JOptionPane.showMessageDialog(this, "请先选中要编辑的角色", "提示", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+        Character existing = list.get(row);
+        Character edited = CharacterDialog.showEditDialog(this, existing, !isPc);
+        if (edited != null) {
+            list.set(row, edited);
+            DefaultTableModel model = isPc ? pcTableModel : enemyTableModel;
+            model.setValueAt(edited.getName(), row, 0);
+            model.setValueAt(edited.getMaxHp(), row, 1);
+            model.setValueAt(getMainSkillDisplay(edited), row, 2);
+        }
+    }
+
+    private String getMainSkillDisplay(Character c) {
+        int fighting = c.getSkill("格斗");
+        int dodge = c.getDodge();
+        return "格斗" + fighting + "/闪避" + dodge;
     }
 
     private JPanel createCharacterPanel(String title, boolean isPc) {

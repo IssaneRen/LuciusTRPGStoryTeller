@@ -298,4 +298,21 @@ public class CharacterDialog extends JDialog {
         dialog.setVisible(true);
         return dialog.getResult();
     }
+
+    public static Character showEditDialog(Frame parent, Character existing, boolean isEnemy) {
+        CharacterDialog dialog = new CharacterDialog(parent, isEnemy);
+        dialog.nameField.setText(existing.getName());
+        dialog.strSpinner.setValue(existing.getStr());
+        dialog.conSpinner.setValue(existing.getCon());
+        dialog.sizSpinner.setValue(existing.getSiz());
+        dialog.dexSpinner.setValue(existing.getDex());
+        dialog.intSpinner.setValue(existing.getIntelligence());
+        dialog.powSpinner.setValue(existing.getPow());
+        dialog.fightingSpinner.setValue(existing.getSkill("格斗"));
+        dialog.pistolSpinner.setValue(existing.getSkill("手枪"));
+        dialog.rifleSpinner.setValue(existing.getSkill("步枪"));
+        dialog.armorSpinner.setValue(existing.getArmor());
+        dialog.setVisible(true);
+        return dialog.getResult();
+    }
 }

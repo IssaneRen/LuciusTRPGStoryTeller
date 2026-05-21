@@ -1,0 +1,44 @@
+[
+  {
+    "name": "深潜者",
+    "str": 65,
+    "con": 65,
+    "siz": 70,
+    "dex": 50,
+    "intelligence": 50,
+    "pow": 50,
+    "app": 20,
+    "edu": 30,
+    "skills": {"格斗": 55, "手枪": 0, "步枪": 0},
+    "weapons": [{"name": "爪击", "skillName": "格斗", "damage": "1D6+DB", "range": 0, "rateOfFire": 1, "ammo": -1}],
+    "armor": 1
+  },
+  {
+    "name": "食尸鬼",
+    "str": 55,
+    "con": 55,
+    "siz": 60,
+    "dex": 65,
+    "intelligence": 50,
+    "pow": 45,
+    "app": 10,
+    "edu": 20,
+    "skills": {"格斗": 55, "手枪": 0, "步枪": 0},
+    "weapons": [{"name": "爪抓", "skillName": "格斗", "damage": "1D6+DB", "range": 0, "rateOfFire": 1, "ammo": -1}],
+    "armor": 1
+  },
+  {
+    "name": "修格斯幼体",
+    "str": 80,
+    "con": 90,
+    "siz": 100,
+    "dex": 30,
+    "intelligence": 25,
+    "pow": 40,
+    "app": 5,
+    "edu": 10,
+    "skills": {"格斗": 70, "手枪": 0, "步枪": 0},
+    "weapons": [{"name": "触手碾压", "skillName": "格斗", "damage": "2D6+DB", "range": 0, "rateOfFire": 1, "ammo": -1}],
+    "armor": 4
+  }
+]

@@ -1,0 +1,58 @@
+[
+  {
+    "name": "杰克·沃伦 (私家侦探)",
+    "str": 60,
+    "con": 55,
+    "siz": 65,
+    "dex": 70,
+    "intelligence": 75,
+    "pow": 60,
+    "app": 50,
+    "edu": 65,
+    "skills": {"格斗": 55, "手枪": 65, "步枪": 30},
+    "weapons": [{"name": ".38左轮", "skillName": "手枪", "damage": "1D10", "range": 15, "rateOfFire": 1, "ammo": 6}],
+    "armor": 0
+  },
+  {
+    "name": "艾琳·布莱克 (考古学家)",
+    "str": 45,
+    "con": 50,
+    "siz": 50,
+    "dex": 65,
+    "intelligence": 80,
+    "pow": 70,
+    "app": 65,
+    "edu": 80,
+    "skills": {"格斗": 35, "手枪": 40, "步枪": 25},
+    "weapons": [{"name": "匕首", "skillName": "格斗", "damage": "1D4+2+DB", "range": 0, "rateOfFire": 1, "ammo": -1}],
+    "armor": 0
+  },
+  {
+    "name": "鲍勃·马丁 (退伍军人)",
+    "str": 75,
+    "con": 70,
+    "siz": 70,
+    "dex": 55,
+    "intelligence": 55,
+    "pow": 50,
+    "app": 45,
+    "edu": 50,
+    "skills": {"格斗": 70, "手枪": 55, "步枪": 75},
+    "weapons": [{"name": "步枪", "skillName": "步枪", "damage": "2D6+4", "range": 90, "rateOfFire": 1, "ammo": 5}],
+    "armor": 1
+  },
+  {
+    "name": "苏珊·李 (医生)",
+    "str": 40,
+    "con": 60,
+    "siz": 45,
+    "dex": 60,
+    "intelligence": 85,
+    "pow": 65,
+    "app": 70,
+    "edu": 85,
+    "skills": {"格斗": 30, "手枪": 35, "步枪": 20},
+    "weapons": [{"name": "拳头", "skillName": "格斗", "damage": "1D3+DB", "range": 0, "rateOfFire": 1, "ammo": -1}],
+    "armor": 0
+  }
+]
