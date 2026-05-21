@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
-import { VueFlow, type Node, type Edge } from '@vue-flow/core'
+import { VueFlow, PanOnScrollMode, type Node, type Edge } from '@vue-flow/core'
 import dagre from '@dagrejs/dagre'
 import '@vue-flow/core/dist/style.css'
 import NodeCard from './NodeCard.vue'
@@ -10,12 +10,11 @@ interface NodeData {
   label: string
   tags?: string[]
   description?: string
-  dependencies?: string[]
 }
 
 interface Props {
   nodes: Array<{ id: string; data: NodeData }>
-  edges: Array<{ id: string; source: string; target: string }>
+  edges: Array<{ id: string; source: string; target: string; label?: string }>
   selectedTags?: string[]
 }
 
@@ -28,10 +27,17 @@ const selectedNode = ref<{ id: string; data: NodeData; position: { x: number; y:
 function getLayoutedElements(nodes: any[], edges: any[]) {
   const g = new dagre.graphlib.Graph()
   g.setDefaultEdgeLabel(() => ({}))
-  g.setGraph({ rankdir: 'LR', nodesep: 80, ranksep: 200 })
+  g.setGraph({
+    rankdir: 'LR',
+    nodesep: 60,
+    ranksep: 250,
+    edgesep: 30,
+    marginx: 40,
+    marginy: 40,
+  })
 
   nodes.forEach(node => {
-    g.setNode(node.id, { width: 180, height: 60 })
+    g.setNode(node.id, { width: 200, height: 72 })
   })
 
   edges.forEach(edge => {
@@ -44,30 +50,12 @@ function getLayoutedElements(nodes: any[], edges: any[]) {
     const pos = g.node(node.id)
     return {
       ...node,
-      position: { x: pos.x - 90, y: pos.y - 30 }
+      position: { x: pos.x - 100, y: pos.y - 36 },
+      sourcePosition: 'right',
+      targetPosition: 'left',
     }
   })
 }
-
-const layoutedNodes = computed(() => {
-  const baseNodes = props.nodes.map(node => ({
-    ...node,
-    type: 'custom'
-  }))
-  return getLayoutedElements(baseNodes, props.edges)
-})
-
-const layoutedEdges = computed(() => {
-  return props.edges.map(edge => ({
-    ...edge,
-    type: 'smoothstep',
-    animated: true,
-    style: {
-      stroke: '#8b5cf6',
-      strokeWidth: 2
-    }
-  }))
-})
 
 function isDimmed(data: NodeData): boolean {
   if (props.selectedTags.length === 0) return false
@@ -75,13 +63,49 @@ function isDimmed(data: NodeData): boolean {
   return !data.tags.some(tag => props.selectedTags.includes(tag))
 }
 
+function isEdgeHidden(edge: { source: string; target: string }): boolean {
+  if (props.selectedTags.length === 0) return false
+  const sourceNode = props.nodes.find(n => n.id === edge.source)
+  const targetNode = props.nodes.find(n => n.id === edge.target)
+  if (!sourceNode || !targetNode) return true
+  return isDimmed(sourceNode.data) || isDimmed(targetNode.data)
+}
+
+const layoutedNodes = computed<Node[]>(() => {
+  const baseNodes = props.nodes.map(node => ({
+    ...node,
+    type: 'custom',
+  }))
+  return getLayoutedElements(baseNodes, props.edges)
+})
+
+const layoutedEdges = computed<Edge[]>(() => {
+  return props.edges.map(edge => ({
+    ...edge,
+    type: 'smoothstep',
+    animated: !isEdgeHidden(edge),
+    hidden: isEdgeHidden(edge),
+    style: {
+      stroke: '#8b5cf6',
+      strokeWidth: 2,
+    },
+    labelStyle: { fill: '#94a3b8', fontSize: 11 },
+    labelBgStyle: { fill: '#1e1e2e', fillOpacity: 0.9 },
+    label: edge.label || '',
+  }))
+})
+
 function selectNode(nodeProps: any) {
   const node = layoutedNodes.value.find(n => n.id === nodeProps.id)
   if (node && !isDimmed(node.data)) {
-    selectedNode.value = {
-      id: node.id,
-      data: node.data,
-      position: node.position
+    if (selectedNode.value?.id === node.id) {
+      selectedNode.value = null
+    } else {
+      selectedNode.value = {
+        id: node.id,
+        data: node.data as NodeData,
+        position: node.position,
+      }
     }
   }
 }
@@ -89,17 +113,29 @@ function selectNode(nodeProps: any) {
 function closeDetail() {
   selectedNode.value = null
 }
+
+function handlePaneClick() {
+  selectedNode.value = null
+}
+
+function handleWheel(e: WheelEvent) {
+  if (e.shiftKey) return
+}
 </script>
 
 <template>
-  <div class="relative w-full h-full">
+  <div class="relative w-full h-full graph-container" @wheel.passive="handleWheel">
     <VueFlow
       :nodes="layoutedNodes"
       :edges="layoutedEdges"
-      class="bg-[#0f0f1a]"
+      class="graph-canvas"
       :fit-view-on-init="true"
-      :min-zoom="0.2"
-      :max-zoom="4"
+      :min-zoom="0.3"
+      :max-zoom="3"
+      :default-edge-options="{ type: 'smoothstep' }"
+      :pan-on-scroll="true"
+      :pan-on-scroll-mode="PanOnScrollMode.Horizontal"
+      @pane-click="handlePaneClick"
     >
       <template #node-custom="nodeProps">
         <NodeCard
@@ -110,11 +146,37 @@ function closeDetail() {
       </template>
     </VueFlow>
 
-    <NodeDetail
-      v-if="selectedNode"
-      :data="selectedNode.data"
-      :position="selectedNode.position"
-      @close="closeDetail"
-    />
+    <Transition name="detail">
+      <NodeDetail
+        v-if="selectedNode"
+        :data="selectedNode.data"
+        :position="selectedNode.position"
+        @close="closeDetail"
+      />
+    </Transition>
   </div>
 </template>
+
+<style>
+.graph-canvas {
+  background: #0f0f1a !important;
+}
+.graph-canvas .vue-flow__edge-path {
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.graph-canvas .vue-flow__edge-text {
+  font-size: 11px;
+}
+.graph-container {
+  overflow-x: auto;
+  overflow-y: hidden;
+}
+.detail-enter-active, .detail-leave-active {
+  transition: opacity 0.15s ease, transform 0.15s ease;
+}
+.detail-enter-from, .detail-leave-to {
+  opacity: 0;
+  transform: translateX(-8px);
+}
+</style>
