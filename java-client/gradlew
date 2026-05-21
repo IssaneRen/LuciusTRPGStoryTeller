@@ -1,0 +1,15 @@
+#!/bin/sh
+# Gradle Wrapper bootstrap - downloads gradle if not present
+GRADLE_VERSION=8.10
+DIST_URL="https://services.gradle.org/distributions/gradle-${GRADLE_VERSION}-bin.zip"
+GRADLE_HOME="${HOME}/.gradle/wrapper/dists/gradle-${GRADLE_VERSION}-bin"
+
+if [ ! -f "${GRADLE_HOME}/gradle-${GRADLE_VERSION}/bin/gradle" ]; then
+    echo "Downloading Gradle ${GRADLE_VERSION}..."
+    mkdir -p "${GRADLE_HOME}"
+    curl -sL "${DIST_URL}" -o "/tmp/gradle-${GRADLE_VERSION}-bin.zip"
+    unzip -qo "/tmp/gradle-${GRADLE_VERSION}-bin.zip" -d "${GRADLE_HOME}"
+    rm "/tmp/gradle-${GRADLE_VERSION}-bin.zip"
+fi
+
+exec "${GRADLE_HOME}/gradle-${GRADLE_VERSION}/bin/gradle" "$@"
