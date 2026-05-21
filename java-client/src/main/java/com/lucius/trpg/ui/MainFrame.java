@@ -519,46 +519,28 @@ public class MainFrame extends JFrame {
         menu.setBackground(UIConstants.BG_CARD);
         menu.setBorder(BorderFactory.createLineBorder(UIConstants.BORDER, 1));
 
-        String[] presets = {"深潜者", "修格斯幼体", "食尸鬼"};
-        for (String preset : presets) {
-            JMenuItem item = new JMenuItem(preset);
-            item.setBackground(UIConstants.BG_CARD);
-            item.setForeground(UIConstants.TEXT_PRIMARY);
-            item.setFont(UIConstants.BODY_FONT);
-            item.addActionListener(e -> addPresetEnemy(preset));
-            menu.add(item);
+        // 从保存的 enemies.json 加载所有预设
+        List<Character> presets = CharacterStore.loadEnemies();
+        if (presets.isEmpty()) {
+            JMenuItem empty = new JMenuItem("(无预设怪物)");
+            empty.setEnabled(false);
+            menu.add(empty);
+        } else {
+            for (Character preset : presets) {
+                JMenuItem item = new JMenuItem(String.format("%s (HP:%d 格斗:%d 护甲:%d)",
+                        preset.getName(), preset.getMaxHp(), preset.getSkill("格斗"), preset.getArmor()));
+                item.setBackground(UIConstants.BG_CARD);
+                item.setForeground(UIConstants.TEXT_PRIMARY);
+                item.setFont(UIConstants.SMALL_FONT);
+                item.addActionListener(e -> {
+                    enemyList.add(preset);
+                    refreshEnemyTable();
+                });
+                menu.add(item);
+            }
         }
 
         menu.show(button, 0, button.getHeight());
-    }
-
-    private void addPresetEnemy(String type) {
-        Character enemy = null;
-        switch (type) {
-            case "深潜者":
-                enemy = new Character("深潜者", 65, 65, 70, 50, 50, 50, 50, 50);
-                enemy.addSkill("格斗", 60);
-                enemy.addWeapon(new com.lucius.trpg.model.Weapon("爪抓", "格斗", "1D6+DB", 0, 1, -1));
-                enemy.setArmor(2);
-                break;
-            case "修格斯幼体":
-                enemy = new Character("修格斯幼体", 80, 90, 100, 30, 25, 40, 30, 30);
-                enemy.addSkill("格斗", 70);
-                enemy.addWeapon(new com.lucius.trpg.model.Weapon("吞噬", "格斗", "2D6", 0, 1, -1));
-                enemy.setArmor(3);
-                break;
-            case "食尸鬼":
-                enemy = new Character("食尸鬼", 55, 55, 60, 65, 40, 45, 40, 40);
-                enemy.addSkill("格斗", 55);
-                enemy.addWeapon(new com.lucius.trpg.model.Weapon("爪抓", "格斗", "1D6", 0, 1, -1));
-                enemy.setArmor(1);
-                break;
-        }
-
-        if (enemy != null) {
-            enemyList.add(enemy);
-            refreshEnemyTable();
-        }
     }
 
     private void refreshPcTable() {

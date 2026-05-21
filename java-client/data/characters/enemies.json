@@ -1,44 +1,16 @@
 [
-  {
-    "name": "深潜者",
-    "str": 65,
-    "con": 65,
-    "siz": 70,
-    "dex": 50,
-    "intelligence": 50,
-    "pow": 50,
-    "app": 20,
-    "edu": 30,
-    "skills": {"格斗": 55, "手枪": 0, "步枪": 0},
-    "weapons": [{"name": "爪击", "skillName": "格斗", "damage": "1D6+DB", "range": 0, "rateOfFire": 1, "ammo": -1}],
-    "armor": 1
-  },
-  {
-    "name": "食尸鬼",
-    "str": 55,
-    "con": 55,
-    "siz": 60,
-    "dex": 65,
-    "intelligence": 50,
-    "pow": 45,
-    "app": 10,
-    "edu": 20,
-    "skills": {"格斗": 55, "手枪": 0, "步枪": 0},
-    "weapons": [{"name": "爪抓", "skillName": "格斗", "damage": "1D6+DB", "range": 0, "rateOfFire": 1, "ammo": -1}],
-    "armor": 1
-  },
-  {
-    "name": "修格斯幼体",
-    "str": 80,
-    "con": 90,
-    "siz": 100,
-    "dex": 30,
-    "intelligence": 25,
-    "pow": 40,
-    "app": 5,
-    "edu": 10,
-    "skills": {"格斗": 70, "手枪": 0, "步枪": 0},
-    "weapons": [{"name": "触手碾压", "skillName": "格斗", "damage": "2D6+DB", "range": 0, "rateOfFire": 1, "ammo": -1}],
-    "armor": 4
-  }
+  {"name":"深潜者","str":80,"con":55,"siz":75,"dex":50,"intelligence":65,"pow":50,"app":20,"edu":30,"skills":{"格斗":40},"weapons":[{"name":"爪击","skillName":"格斗","damage":"1D6+DB","range":0,"rateOfFire":1,"ammo":-1}],"armor":1},
+  {"name":"食尸鬼","str":70,"con":70,"siz":65,"dex":65,"intelligence":60,"pow":50,"app":10,"edu":20,"skills":{"格斗":45},"weapons":[{"name":"爪击/啃咬","skillName":"格斗","damage":"1D6+DB","range":0,"rateOfFire":1,"ammo":-1}],"armor":1},
+  {"name":"修格斯幼体","str":100,"con":75,"siz":90,"dex":65,"intelligence":20,"pow":50,"app":5,"edu":10,"skills":{"格斗":60},"weapons":[{"name":"击打","skillName":"格斗","damage":"2D6","range":0,"rateOfFire":1,"ammo":-1}],"armor":0},
+  {"name":"米·戈","str":50,"con":50,"siz":50,"dex":80,"intelligence":75,"pow":65,"app":10,"edu":70,"skills":{"格斗":40},"weapons":[{"name":"钳爪","skillName":"格斗","damage":"1D6","range":0,"rateOfFire":1,"ammo":-1}],"armor":0},
+  {"name":"暗夜食灵","str":75,"con":40,"siz":65,"dex":90,"intelligence":30,"pow":35,"app":5,"edu":10,"skills":{"格斗":55},"weapons":[{"name":"抓取","skillName":"格斗","damage":"1D4+DB","range":0,"rateOfFire":1,"ammo":-1}],"armor":0},
+  {"name":"蛇人","str":60,"con":55,"siz":60,"dex":70,"intelligence":80,"pow":65,"app":40,"edu":70,"skills":{"格斗":50},"weapons":[{"name":"啃咬(含毒)","skillName":"格斗","damage":"1D8","range":0,"rateOfFire":1,"ammo":-1}],"armor":1},
+  {"name":"飞水螅","str":90,"con":55,"siz":75,"dex":75,"intelligence":30,"pow":50,"app":10,"edu":10,"skills":{"格斗":45},"weapons":[{"name":"啃咬","skillName":"格斗","damage":"1D6+DB","range":0,"rateOfFire":1,"ammo":-1}],"armor":2},
+  {"name":"深潜者混血","str":55,"con":50,"siz":60,"dex":45,"intelligence":65,"pow":50,"app":30,"edu":50,"skills":{"格斗":25},"weapons":[{"name":"拳击","skillName":"格斗","damage":"1D3+DB","range":0,"rateOfFire":1,"ammo":-1}],"armor":0},
+  {"name":"廷达洛斯猎犬","str":80,"con":100,"siz":75,"dex":70,"intelligence":80,"pow":100,"app":5,"edu":50,"skills":{"格斗":90},"weapons":[{"name":"舌头(吸POW)","skillName":"格斗","damage":"1D6","range":0,"rateOfFire":1,"ammo":-1}],"armor":2},
+  {"name":"黑山羊幼仔","str":200,"con":120,"siz":240,"dex":60,"intelligence":35,"pow":90,"app":5,"edu":10,"skills":{"格斗":60},"weapons":[{"name":"触手","skillName":"格斗","damage":"2D6+DB","range":0,"rateOfFire":2,"ammo":-1}],"armor":5},
+  {"name":"狩猎恐魔","str":170,"con":100,"siz":200,"dex":70,"intelligence":25,"pow":75,"app":5,"edu":10,"skills":{"格斗":80},"weapons":[{"name":"尾击","skillName":"格斗","damage":"3D6","range":0,"rateOfFire":1,"ammo":-1}],"armor":5},
+  {"name":"无形之物","str":100,"con":60,"siz":85,"dex":50,"intelligence":50,"pow":60,"app":5,"edu":30,"skills":{"格斗":50},"weapons":[{"name":"爪击","skillName":"格斗","damage":"1D8+DB","range":0,"rateOfFire":1,"ammo":-1}],"armor":2},
+  {"name":"修格斯(完整体)","str":350,"con":200,"siz":380,"dex":40,"intelligence":10,"pow":50,"app":5,"edu":5,"skills":{"格斗":70},"weapons":[{"name":"碾压","skillName":"格斗","damage":"6D6","range":0,"rateOfFire":2,"ammo":-1}],"armor":8},
+  {"name":"星之精","str":280,"con":150,"siz":320,"dex":45,"intelligence":90,"pow":80,"app":5,"edu":50,"skills":{"格斗":60},"weapons":[{"name":"触手拍击","skillName":"格斗","damage":"4D6+DB","range":0,"rateOfFire":1,"ammo":-1}],"armor":10}
 ]
