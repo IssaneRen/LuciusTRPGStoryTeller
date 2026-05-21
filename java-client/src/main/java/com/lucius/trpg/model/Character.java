@@ -33,6 +33,8 @@ public class Character {
     private List<Weapon> weapons;
     private int armor;
 
+    private int luck;
+
     // 状态
     private boolean alive;
 
@@ -53,6 +55,8 @@ public class Character {
         this.mp = pow / 5;
         this.db = calculateDamageBonus(str, siz);
         this.dodge = dex / 2;
+
+        this.luck = pow;
 
         this.skills = new HashMap<>();
         this.weapons = new ArrayList<>();
@@ -186,6 +190,14 @@ public class Character {
 
     public void setArmor(int armor) {
         this.armor = armor;
+    }
+
+    public int getLuck() {
+        return luck;
+    }
+
+    public void spendLuck(int amount) {
+        luck = Math.max(0, luck - amount);
     }
 
     public boolean isAlive() {

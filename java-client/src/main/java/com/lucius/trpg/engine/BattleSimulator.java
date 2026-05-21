@@ -15,6 +15,10 @@ public class BattleSimulator {
         this.combatEngine = new CombatEngine();
     }
 
+    public BattleSimulator(CombatOptions options) {
+        this.combatEngine = new CombatEngine(options);
+    }
+
     /**
      * 批量模拟战斗
      */

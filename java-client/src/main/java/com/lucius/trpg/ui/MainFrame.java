@@ -1,6 +1,7 @@
 package com.lucius.trpg.ui;
 
 import com.lucius.trpg.engine.BattleSimulator;
+import com.lucius.trpg.engine.CombatOptions;
 import com.lucius.trpg.engine.SimulationReport;
 import com.lucius.trpg.model.Character;
 import com.lucius.trpg.model.CharacterStore;
@@ -25,6 +26,8 @@ import java.util.List;
 public class MainFrame extends JFrame {
     private final List<Character> pcList = new ArrayList<>();
     private final List<Character> enemyList = new ArrayList<>();
+    private final CombatOptions combatOptions = new CombatOptions();
+    private final JCheckBox[] optionCheckboxes = new JCheckBox[CombatOptions.NAMES.length];
 
     // 左侧面板组件
     private final DefaultTableModel pcTableModel;
@@ -158,9 +161,29 @@ public class MainFrame extends JFrame {
 
         controlPanel.add(controlContent);
 
+        // 可选规则面板
+        JPanel rulesPanel = createCardPanel("可选规则");
+        JPanel rulesGrid = new JPanel(new GridLayout(0, 1, 0, 2));
+        rulesGrid.setBackground(UIConstants.BG_CARD);
+        for (int i = 0; i < CombatOptions.NAMES.length; i++) {
+            final int idx = i;
+            JCheckBox cb = new JCheckBox(CombatOptions.NAMES[i]);
+            cb.setSelected(combatOptions.getByIndex(i));
+            cb.setFont(UIConstants.SMALL_FONT);
+            cb.setForeground(UIConstants.TEXT_PRIMARY);
+            cb.setBackground(UIConstants.BG_CARD);
+            cb.setToolTipText(CombatOptions.DESCRIPTIONS[i]);
+            cb.addActionListener(e -> combatOptions.setByIndex(idx, cb.isSelected()));
+            optionCheckboxes[i] = cb;
+            rulesGrid.add(cb);
+        }
+        rulesPanel.add(rulesGrid);
+
         leftPanel.add(pcPanel);
         leftPanel.add(Box.createVerticalStrut(UIConstants.PADDING));
         leftPanel.add(enemyPanel);
+        leftPanel.add(Box.createVerticalStrut(UIConstants.PADDING));
+        leftPanel.add(rulesPanel);
         leftPanel.add(Box.createVerticalStrut(UIConstants.PADDING));
         leftPanel.add(controlPanel);
         leftPanel.add(Box.createVerticalGlue());
@@ -543,7 +566,7 @@ public class MainFrame extends JFrame {
         SwingWorker<SimulationReport, String> worker = new SwingWorker<>() {
             @Override
             protected SimulationReport doInBackground() throws Exception {
-                BattleSimulator simulator = new BattleSimulator();
+                BattleSimulator simulator = new BattleSimulator(combatOptions);
                 return simulator.simulate(new ArrayList<>(pcList), new ArrayList<>(enemyList), times);
             }
 
