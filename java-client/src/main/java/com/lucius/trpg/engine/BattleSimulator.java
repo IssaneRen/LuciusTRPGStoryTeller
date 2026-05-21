@@ -52,7 +52,7 @@ public class BattleSimulator {
         report.setPcWins(pcWins);
         report.setEnemyWins(enemyWins);
         report.setAvgRounds((double) totalRounds / times);
-        report.setSurvivalRate((double) totalSurvivors / (times * pcTemplates.size()) * 100);
+        report.setSurvivalRate((double) totalSurvivors / (times * pcTemplates.size()));
         report.calculateDifficultyRating();
 
         // 保存最后一次战斗日志
